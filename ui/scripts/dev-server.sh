@@ -33,20 +33,22 @@ NAME=${DEV_NAME:-$(basename "$PROJECT_DIR")-$(printf '%s' "$PROJECT_DIR" | shasu
 TLD=${DEV_TLD:-localhost}
 LOG="/tmp/$NAME.log"
 PIDFILE="/tmp/$NAME.pid"
+ROUTES="$HOME/.portless/routes.json"
 URL="https://$NAME.$TLD"
 
 # Portless reads its settings from the environment; the proxy's flags only count
 # the first time it starts.
 export PORTLESS_PORT=8080 PORTLESS_HTTPS=0 PORTLESS_UNPRIVILEGED=1 PORTLESS_TLD="$TLD"
 
+# `-f` counts an error response as down, which is right for a missing route:
+# Caddy answers 502 when the dev server behind it is gone. A 5xx from the app
+# itself reads as down too, so a broken page looks like a dead server.
 up() { curl -fsk -o /dev/null --max-time 5 "$URL"; }
 
-proxy_up() { nc -z 127.0.0.1 8080 2>/dev/null; }
-
 # The proxy is shared, so it stays up while any checkout still has a route.
-busy() {
-  [ "$(tr -d '[:space:]' <"$HOME/.portless/routes.json" 2>/dev/null)" != '[]' ]
-}
+busy() { grep -q '"hostname"' "$ROUTES" 2>/dev/null; }
+
+has_route() { grep -qF "\"$1\"" "$ROUTES" 2>/dev/null; }
 
 # A TLD other than .localhost only resolves and only has a certificate once the
 # machine serves it; say so instead of waiting out the readiness loop.
@@ -86,7 +88,9 @@ start() {
     return 0
   fi
 
-  proxy_up || pnpm exec portless proxy start -p 8080 --no-tls --tld "$TLD" >/dev/null
+  # Starting the proxy is a no-op when one already runs on this port, and it
+  # leaves the routes of other checkouts alone.
+  pnpm exec portless proxy start -p "$PORTLESS_PORT" --no-tls --tld "$TLD" >/dev/null
   stop_server
   set -m
   nohup sh -c "exec pnpm exec portless run --name '$NAME'" </dev/null >"$LOG" 2>&1 &
@@ -122,7 +126,7 @@ stop)
   # Portless drops a route a moment after its process is gone, so wait for this
   # checkout's route to clear before asking whether anything else is left.
   i=0
-  while grep -q "$NAME.$TLD" "$HOME/.portless/routes.json" 2>/dev/null && [ "$i" -lt 10 ]; do
+  while has_route "$NAME.$TLD" && [ "$i" -lt 10 ]; do
     sleep 1
     i=$((i + 1))
   done
