@@ -600,7 +600,8 @@
   flex-shrink: 0;
 }
 
-/* The phone menu's trigger, and the sheet it opens. */
+/* The phone menu's trigger, and the sheet it opens. The sheet continues the
+   bar's frame, so its rows take the nav's type and ink. */
 .landing-menu-button {
   display: var(--landing-menu-display);
 }
@@ -612,15 +613,23 @@
 .landing-menu-link {
   display: block;
   padding-block: var(--spacing-2);
-  padding-inline: var(--spacing-3);
+  padding-inline: var(--landing-nav-padding-inline);
   border-radius: var(--radius-inner);
   color: var(--color-ink-muted);
 }
 
+.landing-menu-link:hover {
+  background: var(--color-overlay-hover);
+}
+
+.landing-menu-link:active {
+  background: var(--color-overlay-pressed);
+}
+
 .landing-menu-label {
-  font-size: 0.9375rem;
+  font-size: var(--landing-nav-font-size);
   font-weight: 300;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--landing-nav-tracking);
   line-height: 1.5;
 }
 

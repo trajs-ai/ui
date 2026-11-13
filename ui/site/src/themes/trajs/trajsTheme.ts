@@ -69,16 +69,19 @@ export const trajsTheme = defineTheme({
     button: {
       base: { fontWeight: "500", borderRadius: "var(--radius-element)" },
     },
-    // The phone menu belongs to the glass header. Painting the header surface
-    // instead of a solid panel keeps the artwork faintly visible behind rows
-    // that carry their own legible ink.
+    // The phone menu belongs to the glass header, but it cannot sample the
+    // page the way the bar does. astryx fades the layer in through an opacity
+    // group, and a backdrop filter has no backdrop inside one, so the sheet
+    // stayed transparent for the whole entrance. It paints the glass over the
+    // body color instead, which needs both properties because color-mix
+    // interpolates rather than composites.
     popover: {
       base: {
-        backgroundColor: "color-mix(in srgb, var(--color-background-body) 88%, transparent)",
+        backgroundColor: "var(--color-background-body)",
         backgroundImage:
           "linear-gradient(var(--color-background-surface), var(--color-background-surface))",
-        backdropFilter: "blur(var(--spacing-4))",
         borderRadius: "var(--radius-element)",
+        boxShadow: "none",
       },
     },
     "bottom-sheet": {

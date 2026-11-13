@@ -240,95 +240,107 @@ export function App() {
             </HStack>
           </Link>
           <LandingMarks />
-          <HStack
-            as="header"
-            vAlign="center"
-            gap={4}
-            className={chromeVisible ? "landing-header landing-header--visible" : "landing-header"}
-            inert={!chromeVisible}
-            aria-hidden={!chromeVisible}
-          >
-            <Link href={import.meta.env.BASE_URL} color="inherit" type="inherit">
-              <HStack gap={2} vAlign="center" className="landing-brand">
-                <img src={assets.logoMark} alt="" className="landing-brand-mark" />
-                <Text type="inherit">TRAJS</Text>
-              </HStack>
-            </Link>
-            <HStack vAlign="center" className="landing-header-end">
-              <HStack as="nav" aria-label="Main navigation" vAlign="center" className="landing-nav">
+          <Popover
+            isOpen={menuOpen}
+            onOpenChange={setMenuOpen}
+            label="Menu"
+            placement="below"
+            alignment="end"
+            padding={0}
+            content={
+              <VStack gap={0.5}>
                 {navigation.map(({ label, href }) => (
                   <Link
                     key={label}
                     href={href}
                     color="inherit"
                     type="inherit"
-                    className={
-                      label === "CHANGELOG"
-                        ? "landing-nav-link landing-changelog"
-                        : "landing-nav-link"
-                    }
+                    className="landing-menu-link"
+                    onClick={() => setMenuOpen(false)}
                   >
-                    <HStack gap={1.5} vAlign="center">
-                      <Text type="inherit">{label}</Text>
-                      {label === "GITHUB" && (
-                        <img src={assets.arrow} alt="" className="landing-ink-asset" />
-                      )}
+                    <HStack hAlign="between" vAlign="center" gap={3}>
+                      <Text type="inherit" className="landing-menu-label">
+                        {label}
+                      </Text>
+                      <img src={assets.arrowUpRight} alt="" className="landing-ink-asset" />
                     </HStack>
                   </Link>
                 ))}
-              </HStack>
-              <IconButton
-                label={mode === "dark" ? "Use light theme" : "Use dark theme"}
-                size="sm"
-                variant="ghost"
-                className="landing-theme-toggle"
-                onClick={() => setMode(mode === "dark" ? "light" : "dark")}
-                icon={mode === "dark" ? <SunIcon /> : <MoonIcon />}
-              />
-              <Popover
-                isOpen={menuOpen}
-                onOpenChange={setMenuOpen}
-                label="Menu"
-                placement="below"
-                alignment="end"
-                width={224}
-                padding={1}
-                content={
-                  <VStack gap={0.5}>
+              </VStack>
+            }
+          >
+            {/* The bar is the menu's anchor, not the icon. Anchored to the
+                icon, the sheet opens inside the bar. */}
+            {({ ref: anchorRef, ...trigger }) => (
+              <HStack
+                as="header"
+                ref={anchorRef}
+                vAlign="center"
+                gap={4}
+                className={
+                  chromeVisible ? "landing-header landing-header--visible" : "landing-header"
+                }
+                inert={!chromeVisible}
+                aria-hidden={!chromeVisible}
+              >
+                <Link href={import.meta.env.BASE_URL} color="inherit" type="inherit">
+                  <HStack gap={2} vAlign="center" className="landing-brand">
+                    <img src={assets.logoMark} alt="" className="landing-brand-mark" />
+                    <Text type="inherit">TRAJS</Text>
+                  </HStack>
+                </Link>
+                <HStack vAlign="center" className="landing-header-end">
+                  <HStack
+                    as="nav"
+                    aria-label="Main navigation"
+                    vAlign="center"
+                    className="landing-nav"
+                  >
                     {navigation.map(({ label, href }) => (
                       <Link
                         key={label}
                         href={href}
                         color="inherit"
                         type="inherit"
-                        className="landing-menu-link"
-                        onClick={() => setMenuOpen(false)}
+                        className={
+                          label === "CHANGELOG"
+                            ? "landing-nav-link landing-changelog"
+                            : "landing-nav-link"
+                        }
                       >
-                        <HStack hAlign="between" vAlign="center" gap={3}>
-                          <Text type="inherit" className="landing-menu-label">
-                            {label}
-                          </Text>
-                          <img src={assets.arrowUpRight} alt="" className="landing-ink-asset" />
+                        <HStack gap={1.5} vAlign="center">
+                          <Text type="inherit">{label}</Text>
+                          {label === "GITHUB" && (
+                            <img src={assets.arrow} alt="" className="landing-ink-asset" />
+                          )}
                         </HStack>
                       </Link>
                     ))}
-                  </VStack>
-                }
-              >
-                <IconButton
-                  label="Open menu"
-                  variant="ghost"
-                  size="sm"
-                  className={
-                    menuOpen
-                      ? "landing-menu-button landing-menu-button--open"
-                      : "landing-menu-button"
-                  }
-                  icon={<MenuIcon />}
-                />
-              </Popover>
-            </HStack>
-          </HStack>
+                  </HStack>
+                  <IconButton
+                    label={mode === "dark" ? "Use light theme" : "Use dark theme"}
+                    size="sm"
+                    variant="ghost"
+                    className="landing-theme-toggle"
+                    onClick={() => setMode(mode === "dark" ? "light" : "dark")}
+                    icon={mode === "dark" ? <SunIcon /> : <MoonIcon />}
+                  />
+                  <IconButton
+                    {...trigger}
+                    label="Open menu"
+                    variant="ghost"
+                    size="sm"
+                    className={
+                      menuOpen
+                        ? "landing-menu-button landing-menu-button--open"
+                        : "landing-menu-button"
+                    }
+                    icon={<MenuIcon />}
+                  />
+                </HStack>
+              </HStack>
+            )}
+          </Popover>
           <Grid className="landing-hero">
             <VStack className="landing-headline">
               <Heading level={1} className="landing-heading">

@@ -141,10 +141,10 @@
   }
 
   .astryx-popover {
-    background-color: color-mix(in srgb, var(--color-background-body) 88%, transparent);
+    background-color: var(--color-background-body);
     background-image: linear-gradient(var(--color-background-surface), var(--color-background-surface));
-    backdrop-filter: blur(var(--spacing-4));
     border-radius: var(--radius-element);
+    box-shadow: none;
     --_popover-radius: var(--radius-element);
   }
 
