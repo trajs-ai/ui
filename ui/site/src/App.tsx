@@ -3,14 +3,18 @@ import { Button } from "@astryxdesign/core/Button";
 import { ClickableCard } from "@astryxdesign/core/ClickableCard";
 import { Grid } from "@astryxdesign/core/Grid";
 import { Heading } from "@astryxdesign/core/Heading";
+import { useAnnounce, useClipboard, useMediaQuery } from "@astryxdesign/core/hooks";
 import { HStack } from "@astryxdesign/core/HStack";
+import { Icon } from "@astryxdesign/core/Icon";
 import { IconButton } from "@astryxdesign/core/IconButton";
 import { Link } from "@astryxdesign/core/Link";
-import { Popover } from "@astryxdesign/core/Popover";
+import { MobileNav } from "@astryxdesign/core/MobileNav";
+import { SideNavItem } from "@astryxdesign/core/SideNav";
 import { Text } from "@astryxdesign/core/Text";
 import { Theme } from "@astryxdesign/core/theme";
+import { TopNav, TopNavItem } from "@astryxdesign/core/TopNav";
 import { VStack } from "@astryxdesign/core/VStack";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type SVGProps } from "react";
 
 import { defaultThemeSlug, themes } from "./astryx-themes";
 import { BrandMark } from "./internal/brand-mark";
@@ -64,9 +68,11 @@ const footerGroups = [
   },
 ] as const;
 
-function SunIcon() {
+// Astryx has no sun or moon glyph, so the board's artwork reaches `Icon` as a
+// component and takes its size from it.
+function SunGlyph(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg width="16" height="16" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+    <svg viewBox="0 0 12 12" fill="none" {...props}>
       <circle cx="6" cy="6" r="2.075" stroke="currentColor" strokeWidth="1.25" />
       <path
         d="M6 0.7V1.95M6 10.05V11.3M0.7 6H1.95M10.05 6H11.3M2.26 2.26L3.13 3.13M9.74 2.26L8.87 3.13M2.26 9.74L3.13 8.87M9.74 9.74L8.87 8.87"
@@ -78,62 +84,12 @@ function SunIcon() {
   );
 }
 
-function MoonIcon() {
+function MoonGlyph(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="6.9375 6.9375 10.125 10.125"
-      fill="none"
-      aria-hidden="true"
-    >
+    <svg viewBox="6.9375 6.9375 10.125 10.125" fill="none" {...props}>
       <path
         d="M10.4697 6.93701C9.85399 7.73187 9.4873 8.72972 9.4873 9.81299C9.48741 12.4086 11.5918 14.5132 14.1875 14.5132C15.2709 14.5132 16.2676 14.1447 17.0625 13.5288C16.3678 15.5831 14.4265 17.0629 12.1377 17.063C9.26581 17.063 6.9375 14.7347 6.9375 11.8628C6.9375 9.57437 8.41605 7.63211 10.4697 6.93701Z"
         fill="currentColor"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 20 20"
-      fill="none"
-      aria-hidden="true"
-      className="landing-command-icon"
-    >
-      <path
-        d="M4.75 10.5L8.25 14L15.25 6.5"
-        stroke="currentColor"
-        strokeWidth="1.7923"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function MenuIcon() {
-  return (
-    <svg width="20" height="10" viewBox="0 0 20 10" fill="none" aria-hidden="true">
-      <rect width="20" height="2" fill="currentColor" />
-      <rect y="8" width="20" height="2" fill="currentColor" />
-    </svg>
-  );
-}
-
-function ArrowUpIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-      <path
-        d="M6 10.5V1.5M2 5.5L6 1.5L10 5.5"
-        stroke="currentColor"
-        strokeWidth="1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
       />
     </svg>
   );
@@ -148,21 +104,20 @@ export function App() {
     }
   });
 
-  const [reducesMotion, setReducesMotion] = useState(
-    () => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-  );
+  const reducesMotion = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   const assets = landingAssets[mode];
   const shader = (reducesMotion ? stillBrandShaders : brandShaders)[mode];
-  const [copyStatus, setCopyStatus] = useState("");
-  const [copyAttempt, setCopyAttempt] = useState(0);
-  const [installCopied, setInstallCopied] = useState(false);
   const [headerVisible, setHeaderVisible] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Every breakpoint keeps the header fixed to the page frame and reveals it
-  // after scrolling.
-  const chromeVisible = headerVisible;
+  // The hook owns the copied window, the repeat copy, and the announcement.
+  const { copy, isCopied: installCopied } = useClipboard({
+    announce: "Install command copied.",
+    resetAfterMs: 2500,
+  });
+
+  const announce = useAnnounce();
 
   useEffect(() => {
     const update = () => setHeaderVisible(window.scrollY > 64);
@@ -172,26 +127,15 @@ export function App() {
     return () => window.removeEventListener("scroll", update);
   }, []);
 
-  // The menu renders outside the header, so hiding the header closes it.
+  // The drawer renders outside the header, so hiding the header closes it.
   useEffect(() => {
-    if (!chromeVisible) setMenuOpen(false);
-  }, [chromeVisible]);
-
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReducesMotion(query.matches);
-    query.addEventListener("change", update);
-
-    return () => query.removeEventListener("change", update);
-  }, []);
+    if (!headerVisible) setMenuOpen(false);
+  }, [headerVisible]);
 
   useEffect(() => {
     const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-    const colorScheme = document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]');
 
     if (themeColor) themeColor.content = palette[mode].canvas;
-
-    if (colorScheme) colorScheme.content = mode;
 
     try {
       localStorage.setItem("trajs-color-mode", mode);
@@ -200,32 +144,12 @@ export function App() {
     }
   }, [mode]);
 
-  // The icon's copied state lasts exactly as long as its announcement, so the
-  // two never disagree. A repeat copy writes the same message, so the attempt
-  // counts alongside it and restarts the wait instead of letting the first one
-  // expire mid-announcement.
-  useEffect(() => {
-    if (!copyStatus) return;
-
-    const timer = window.setTimeout(() => {
-      setCopyStatus("");
-      setInstallCopied(false);
-    }, 2500);
-
-    return () => window.clearTimeout(timer);
-  }, [copyStatus, copyAttempt]);
-
+  // The hook stays silent on a failed write, so the fallback is announced
+  // instead. The command above is selectable text.
   async function copyInstallCommand() {
-    try {
-      await navigator.clipboard.writeText(installCommand);
-      setInstallCopied(true);
-      setCopyStatus("Install command copied.");
-    } catch {
-      setInstallCopied(false);
-      setCopyStatus("Copy unavailable. Select the command to copy it manually.");
-    }
+    if (await copy(installCommand)) return;
 
-    setCopyAttempt((attempt) => attempt + 1);
+    announce("Copy unavailable. Select the command to copy it manually.");
   }
 
   return (
@@ -240,68 +164,35 @@ export function App() {
             </HStack>
           </Link>
           <LandingMarks />
-          <Popover
-            isOpen={menuOpen}
-            onOpenChange={setMenuOpen}
-            label="Menu"
-            placement="below"
-            alignment="end"
-            padding={0}
-            content={
-              <VStack gap={0.5}>
-                {navigation.map(({ label, href }) => (
-                  <Link
-                    key={label}
-                    href={href}
-                    color="inherit"
-                    type="inherit"
-                    className="landing-menu-link"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    <HStack hAlign="between" vAlign="center" gap={3}>
-                      <Text type="inherit" className="landing-menu-label">
-                        {label}
-                      </Text>
-                      <img src={assets.arrowUpRight} alt="" className="landing-ink-asset" />
-                    </HStack>
-                  </Link>
-                ))}
-              </VStack>
-            }
+          {/* The frame is the page's and the navigation is TopNav's, so the links
+              and the drawer keep the system's semantics and keyboard behavior. */}
+          <HStack
+            as="header"
+            vAlign="center"
+            gap={4}
+            className={headerVisible ? "landing-header landing-header--visible" : "landing-header"}
+            inert={!headerVisible}
+            aria-hidden={!headerVisible}
           >
-            {/* The bar is the menu's anchor, not the icon. Anchored to the
-                icon, the sheet opens inside the bar. */}
-            {({ ref: anchorRef, ...trigger }) => (
-              <HStack
-                as="header"
-                ref={anchorRef}
-                vAlign="center"
-                gap={4}
-                className={
-                  chromeVisible ? "landing-header landing-header--visible" : "landing-header"
-                }
-                inert={!chromeVisible}
-                aria-hidden={!chromeVisible}
-              >
+            <TopNav
+              className="landing-top-nav"
+              label="Main navigation"
+              heading={
                 <Link href={import.meta.env.BASE_URL} color="inherit" type="inherit">
                   <HStack gap={2} vAlign="center" className="landing-brand">
                     <img src={assets.logoMark} alt="" className="landing-brand-mark" />
                     <Text type="inherit">TRAJS</Text>
                   </HStack>
                 </Link>
+              }
+              endContent={
                 <HStack vAlign="center" className="landing-header-end">
-                  <HStack
-                    as="nav"
-                    aria-label="Main navigation"
-                    vAlign="center"
-                    className="landing-nav"
-                  >
+                  <HStack vAlign="center" className="landing-nav">
                     {navigation.map(({ label, href }) => (
-                      <Link
+                      <TopNavItem
                         key={label}
+                        label={label}
                         href={href}
-                        color="inherit"
-                        type="inherit"
                         className={
                           label === "CHANGELOG"
                             ? "landing-nav-link landing-changelog"
@@ -314,7 +205,7 @@ export function App() {
                             <img src={assets.arrow} alt="" className="landing-ink-asset" />
                           )}
                         </HStack>
-                      </Link>
+                      </TopNavItem>
                     ))}
                   </HStack>
                   <IconButton
@@ -323,24 +214,46 @@ export function App() {
                     variant="ghost"
                     className="landing-theme-toggle"
                     onClick={() => setMode(mode === "dark" ? "light" : "dark")}
-                    icon={mode === "dark" ? <SunIcon /> : <MoonIcon />}
+                    icon={
+                      mode === "dark" ? (
+                        <Icon icon={SunGlyph} size="sm" />
+                      ) : (
+                        <Icon icon={MoonGlyph} size="sm" />
+                      )
+                    }
                   />
                   <IconButton
-                    {...trigger}
                     label="Open menu"
                     variant="ghost"
                     size="sm"
-                    className={
-                      menuOpen
-                        ? "landing-menu-button landing-menu-button--open"
-                        : "landing-menu-button"
-                    }
-                    icon={<MenuIcon />}
+                    className="landing-menu-button"
+                    aria-expanded={menuOpen}
+                    onClick={() => setMenuOpen(true)}
+                    icon={<Icon icon="menu" />}
                   />
                 </HStack>
-              </HStack>
-            )}
-          </Popover>
+              }
+            />
+          </HStack>
+          <MobileNav
+            isOpen={menuOpen}
+            onOpenChange={setMenuOpen}
+            side="end"
+            header={
+              <Text type="inherit" className="landing-brand">
+                TRAJS
+              </Text>
+            }
+          >
+            {navigation.map(({ label, href }) => (
+              <SideNavItem
+                key={label}
+                label={label}
+                href={href}
+                onClick={() => setMenuOpen(false)}
+              />
+            ))}
+          </MobileNav>
           <Grid className="landing-hero">
             <VStack className="landing-headline">
               <Heading level={1} className="landing-heading">
@@ -390,16 +303,13 @@ export function App() {
                   {installCommand}
                 </Text>
                 {installCopied ? (
-                  <CheckIcon />
+                  <Icon icon="check" className="landing-command-icon" />
                 ) : (
-                  <img src={assets.copy} alt="" className="landing-ink-asset" />
+                  <Icon icon="copy" className="landing-command-icon" />
                 )}
               </ClickableCard>
             </HStack>
           </Grid>
-          <Text as="p" role="status" aria-live="polite" className="landing-status">
-            {copyStatus}
-          </Text>
         </VStack>
         <VStack as="footer" className="landing-footer">
           <Grid className="landing-footer-index">
@@ -467,7 +377,7 @@ export function App() {
                 <Text type="inherit" className="landing-legal-label">
                   BACK TO TOP
                 </Text>
-                <ArrowUpIcon />
+                <Icon icon="arrowUp" size="xsm" />
               </HStack>
             </Link>
           </HStack>

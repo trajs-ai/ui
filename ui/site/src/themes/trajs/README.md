@@ -5,8 +5,9 @@ Source: [TRAJS desktop board, 1920 × 1080](https://www.figma.com/design/wHC1Hy6
 `figma.tokens.json` records shared variables, both color modes and the board's
 literal canvas fills. `palette.ts` owns the reviewed light/dark colors shared by
 the Astryx theme and the shader. `trajsTheme.ts` maps these colors to semantic
-roles and carries the board's two component defaults. It is the skin only: no
-page geometry, no breakpoints, no `--landing-*` properties.
+roles and carries the board's control defaults, plus the one token that keeps
+the phone drawer opaque. It is the skin only: no page geometry, no breakpoints,
+no `--landing-*` properties.
 
 | Figma role                            | Astryx role                                    |
 | ------------------------------------- | ---------------------------------------------- |

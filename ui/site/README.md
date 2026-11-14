@@ -43,9 +43,10 @@ variables, semantic mappings, local fonts and rebuild instructions live in
 [`src/themes/trajs/README.md`](src/themes/trajs/README.md). Edit `trajsTheme.ts`
 and rebuild the theme rather than editing its generated CSS or adding global
 color overrides. The theme is the skin — palette, typefaces, radii, the board's
-two component defaults — and a page's composition is never part of it. Both
-modes share `palette.ts`; each uses its own original Figma SVG assets and shader
-pigments.
+control defaults, and the one token the phone drawer needs to be opaque — and a
+page's composition is never part of it. Both modes share `palette.ts`; the brand
+marks and the bar's accent arrows are the board's original Figma exports per
+mode, and the shader pigments come from the same palette.
 
 The page's composition is `src/internal/landing.css`: the sheet's frame, the
 hero, the masthead and the footer, with the values that are this page's own
@@ -57,7 +58,11 @@ bands was drawn on one of the three Figma boards.
 The header is fixed and initially hidden. Scrolling past 64 CSS pixels reveals
 it through blur, opacity and translation; returning to the top hides it again.
 Hidden navigation is inert. Reduced-motion preferences disable this transition
-and render a still frame of the brand shader.
+and render a still frame of the brand shader. The bar is the page's own frame,
+so its slots are filled here, while the navigation in it is the design
+system's. `TopNav` carries the links and `MobileNav` the phone drawer the menu
+button opens. The install command's copy confirmation is `useClipboard`'s, not
+the page's own timer.
 
 The footer is not drawn on the board, and it is detached from the sheet: the
 frame's border closes after the index, and the footer stands below it on the

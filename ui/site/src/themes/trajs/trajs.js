@@ -76,17 +76,9 @@ export const trajsTheme = {
         "borderRadius": "var(--radius-element)"
       }
     },
-    "popover": {
+    "mobile-nav": {
       "base": {
-        "backgroundColor": "var(--color-background-body)",
-        "backgroundImage": "linear-gradient(var(--color-background-surface), var(--color-background-surface))",
-        "borderRadius": "var(--radius-element)",
-        "boxShadow": "none"
-      }
-    },
-    "bottom-sheet": {
-      "base": {
-        "backgroundColor": "var(--color-background-card)"
+        "--color-background-surface": "var(--color-background-body)"
       }
     }
   },

@@ -19,7 +19,7 @@
   --landing-page-inline: clamp(2.5rem, 4vw, 6rem);
   --landing-page-top: var(--landing-page-inline);
   --landing-page-bottom: var(--landing-page-inline);
-  --landing-frame-outset: 1.5rem;
+  --landing-frame-outset: var(--spacing-6);
   --landing-ruler-display: flex;
   --landing-grid-display: block;
 
@@ -31,23 +31,25 @@
   /* Masthead: the band that opens the sheet. Its one label reads as the page's
      title row, not a second header. */
   --landing-notice-height: 2.5rem;
-  --landing-notice-padding-inline: 2.5rem;
+  --landing-notice-padding-inline: var(--spacing-10);
   --landing-notice-size: 0.8125rem;
   --landing-notice-tracking: 0.12em;
 
   /* Header */
   --landing-nav-top: clamp(1.5rem, 2vw, 2.5rem);
   --landing-nav-height: clamp(4.75rem, 2.5rem + 2.5vw, 5.5rem);
-  --landing-nav-padding-block: 1rem;
-  --landing-nav-padding-inline: 3rem;
-  --landing-nav-gap: 1.75rem;
+  --landing-nav-padding-block: var(--spacing-4);
+  --landing-nav-padding-inline: var(--spacing-12);
+  --landing-nav-gap: var(--spacing-7);
   --landing-nav-font-size: 0.9375rem;
   --landing-nav-tracking: 0.08em;
   --landing-nav-display: flex;
   --landing-menu-display: none;
   --landing-brand-size: 1.25rem;
   --landing-header-blur: 0.75rem;
-  --landing-header-transition: opacity 180ms ease, filter 220ms ease;
+  --landing-header-transition:
+    opacity var(--duration-fast) var(--ease-standard),
+    filter var(--duration-fast) var(--ease-entrance);
   --landing-theme-toggle-size: 1.5rem;
 
   /* Hero. The heading is the board's display: 135/144 at weight 250, with its
@@ -56,7 +58,7 @@
   --landing-stage-bottom: 8rem;
   --landing-hero-areas: "headline art";
   --landing-hero-columns: minmax(0, 678fr) minmax(0, 1010fr);
-  --landing-hero-column-gap: 2.5rem;
+  --landing-hero-column-gap: var(--spacing-10);
   --landing-hero-row-gap: 0rem;
   --landing-hero-width: auto;
   --landing-hero-margin: 0;
@@ -117,30 +119,36 @@
   --landing-index-label-leading: 1.5rem;
   --landing-index-link-size: clamp(0.8125rem, 0.5rem + 0.4167vw, 1rem);
   --landing-changelog-display: flex;
-  --landing-card-gap: 1.25rem;
+  --landing-card-gap: var(--spacing-5);
 
   /* Footer: the brand block and its two link groups share three tracks, so the
      band reads as one measured grid. */
   --landing-footer-gap: 4.5rem;
-  --landing-footer-padding: 2.5rem;
-  --landing-footer-bottom: 1.5rem;
+  --landing-footer-padding: var(--spacing-10);
+  --landing-footer-bottom: var(--spacing-6);
   --landing-footer-columns: repeat(3, minmax(0, 1fr));
   --landing-footer-column-gap: 4.5rem;
   --landing-footer-row-gap: 0rem;
-  --landing-footer-brand-gap: 1.5rem;
+  --landing-footer-brand-gap: var(--spacing-6);
   --landing-footer-about-width: 22rem;
-  --landing-footer-link-gap: 0.75rem;
+  --landing-footer-link-gap: var(--spacing-3);
   --landing-footer-link-size: var(--landing-index-link-size);
   --landing-footer-legal-gap: 4rem;
-  --landing-footer-legal-padding: 1.5rem;
+  --landing-footer-legal-padding: var(--spacing-6);
   --landing-footer-legal-size: 0.8125rem;
   --landing-footer-legal-tracking: 0.12em;
-  --landing-footer-meta-gap: 1.5rem;
+  --landing-footer-meta-gap: var(--spacing-6);
 
   /* The mark is drawn before it is filled: the paper island and the wireframe
      arrive over one beat, and the shader waits for that beat to end rather than
      for a copy of its duration, so this is the only place the draw is timed.
-     Each layer changes one of these two properties. */
+     Each layer changes one of these two properties.
+
+     These two beats keep the board's own curve and length instead of the
+     motion roles. The pen travels at an even rate from the first frame to the
+     last, and the fill waits for that last frame. The `--ease-*` roles are
+     entrance curves that finish most of their travel early, which left the
+     wireframe still for a beat before the color arrived. */
   --landing-mark-transition: opacity 800ms ease-in-out, stroke-dashoffset 800ms ease-in-out;
   /* The shader arrives after the first paint, so it settles out of a heavier
      blur than the header, over a long and unhurried run. */
@@ -154,8 +162,8 @@
        behavior while its contents reflow; the hero becomes a centered art +
        headline pair with the CTAs underneath. This band stops at the desktop
        edge, where the position-sensitive board takes over. */
-    --landing-page-inline: 2.5rem;
-    --landing-frame-outset: 1rem;
+    --landing-page-inline: var(--spacing-10);
+    --landing-frame-outset: var(--spacing-4);
     --landing-nav-height: 5.5rem;
     /* The tablet header keeps its 834 board spacing and tightens just enough for
        the 720px edge, where the 640px hero still fits. */
@@ -173,15 +181,14 @@
        viewport, reaching 85% of the sheet at the desktop edge. It never grows
        past the first screen: the headline and the art keep the board's ratios,
        so the block is 0.675 of its width tall, and the guard below stops it
-       where that height would run into the sheet's own padding. The status line
-       under the hero takes a further 1.5rem. */
+       where that height would run into the sheet's own padding. */
     --landing-tablet-block: clamp(
       40rem,
       calc(40rem + (100vw - 834px) * 0.85148),
       calc(
         (
             100svh - var(--landing-page-top) - var(--landing-page-bottom) -
-              var(--landing-stage-top) - var(--landing-stage-bottom) - 1.5rem
+              var(--landing-stage-top) - var(--landing-stage-bottom)
           ) *
           1.4817
       )
@@ -224,18 +231,18 @@
     --landing-index-body-leading: 1.5625rem;
     --landing-index-label-size: 0.9375rem;
     --landing-index-link-size: 0.875rem;
-    --landing-card-gap: 1rem;
+    --landing-card-gap: var(--spacing-4);
     /* The footer keeps three columns but tightens their gutters so the brand
        block and both link groups still breathe. */
-    --landing-footer-gap: 3rem;
-    --landing-footer-padding: 2rem;
-    --landing-footer-bottom: 1.25rem;
+    --landing-footer-gap: var(--spacing-12);
+    --landing-footer-padding: var(--spacing-8);
+    --landing-footer-bottom: var(--spacing-5);
     --landing-footer-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-    --landing-footer-column-gap: 1.5rem;
-    --landing-footer-brand-gap: 1.25rem;
+    --landing-footer-column-gap: var(--spacing-6);
+    --landing-footer-brand-gap: var(--spacing-5);
     --landing-footer-about-width: none;
-    --landing-footer-legal-gap: 3rem;
-    --landing-footer-legal-padding: 1.25rem;
+    --landing-footer-legal-gap: var(--spacing-12);
+    --landing-footer-legal-padding: var(--spacing-5);
   }
 }
 
@@ -284,32 +291,32 @@
   .landing-page {
     /* Phone: one column all the way down. The nav becomes a menu sheet, the
        symbol sits above the headline, and the CTAs move into that sheet. */
-    --landing-page-inline: 1.25rem;
+    --landing-page-inline: var(--spacing-5);
     /* The phone layout is a single column in a 20px margin, so the frame outset
        stays small and the ruler steps out of the way. The graph paper stays: it
        is the sheet's floor at every size, and the phone frame is wide enough to
        carry the same module. */
     --landing-ruler-display: none;
-    --landing-frame-outset: 0.5rem;
+    --landing-frame-outset: var(--spacing-2);
     /* The phone band drops a size and tightens tracking so the release line
        stays on one row. */
     --landing-notice-height: 2.25rem;
-    --landing-notice-padding-inline: 1rem;
+    --landing-notice-padding-inline: var(--spacing-4);
     --landing-notice-size: 0.75rem;
     --landing-notice-tracking: 0.08em;
     --landing-nav-height: 3.25rem;
-    --landing-nav-padding-block: 0.5rem;
-    --landing-nav-padding-inline: 1rem;
+    --landing-nav-padding-block: var(--spacing-2);
+    --landing-nav-padding-inline: var(--spacing-4);
     --landing-nav-display: none;
     --landing-menu-display: flex;
     /* The fixed header takes no space in the flow, so the stage reserves the
        header band. */
-    --landing-stage-top: calc(var(--landing-nav-height) + 1.5rem);
-    --landing-stage-bottom: 1.5rem;
+    --landing-stage-top: calc(var(--landing-nav-height) + var(--spacing-6));
+    --landing-stage-bottom: var(--spacing-6);
     --landing-hero-areas: "art" "headline";
     --landing-hero-columns: minmax(0, 1fr);
     --landing-hero-column-gap: 0rem;
-    --landing-hero-row-gap: 1.5rem;
+    --landing-hero-row-gap: var(--spacing-6);
     --landing-hero-width: auto;
     --landing-hero-margin: 0;
     --landing-hero-align: start;
@@ -330,23 +337,23 @@
     --landing-index-body-leading: 1.4375rem;
     --landing-index-label-size: 0.9375rem;
     --landing-index-link-size: 0.8125rem;
-    --landing-card-gap: 0.5rem;
+    --landing-card-gap: var(--spacing-2);
     /* The phone footer stacks the brand over its two link groups, and the legal
        line drops a size so it still fits one row. */
-    --landing-footer-gap: 2.5rem;
-    --landing-footer-padding: 1.5rem;
-    --landing-footer-bottom: 1rem;
+    --landing-footer-gap: var(--spacing-10);
+    --landing-footer-padding: var(--spacing-6);
+    --landing-footer-bottom: var(--spacing-4);
     --landing-footer-columns: minmax(0, 1fr);
     --landing-footer-column-gap: 0rem;
-    --landing-footer-row-gap: 2.5rem;
-    --landing-footer-brand-gap: 1rem;
+    --landing-footer-row-gap: var(--spacing-10);
+    --landing-footer-brand-gap: var(--spacing-4);
     --landing-footer-about-width: none;
     --landing-footer-link-gap: 0.625rem;
-    --landing-footer-legal-gap: 2rem;
-    --landing-footer-legal-padding: 1rem;
+    --landing-footer-legal-gap: var(--spacing-8);
+    --landing-footer-legal-padding: var(--spacing-4);
     --landing-footer-legal-size: 0.75rem;
     --landing-footer-legal-tracking: 0.06em;
-    --landing-footer-meta-gap: 0.75rem;
+    --landing-footer-meta-gap: var(--spacing-3);
   }
 }
 
@@ -565,6 +572,11 @@
   gap: var(--spacing-6);
 }
 
+/* The header owns the frame, so the nav takes the row it is given. */
+.landing-top-nav {
+  flex: 1;
+}
+
 .landing-brand {
   font-family: var(--font-wordmark);
   font-size: var(--landing-brand-size);
@@ -589,7 +601,10 @@
 .landing-nav-link {
   font-size: inherit;
   font-weight: inherit;
+  color: inherit;
   white-space: nowrap;
+  /* The board's links are the label itself, so the item adds no padding. */
+  padding: 0;
 }
 
 .landing-changelog {
@@ -600,37 +615,9 @@
   flex-shrink: 0;
 }
 
-/* The phone menu's trigger, and the sheet it opens. The sheet continues the
-   bar's frame, so its rows take the nav's type and ink. */
+/* The drawer it opens is MobileNav's. */
 .landing-menu-button {
   display: var(--landing-menu-display);
-}
-
-.landing-menu-button--open {
-  background: var(--color-overlay-pressed);
-}
-
-.landing-menu-link {
-  display: block;
-  padding-block: var(--spacing-2);
-  padding-inline: var(--landing-nav-padding-inline);
-  border-radius: var(--radius-inner);
-  color: var(--color-ink-muted);
-}
-
-.landing-menu-link:hover {
-  background: var(--color-overlay-hover);
-}
-
-.landing-menu-link:active {
-  background: var(--color-overlay-pressed);
-}
-
-.landing-menu-label {
-  font-size: var(--landing-nav-font-size);
-  font-weight: 300;
-  letter-spacing: var(--landing-nav-tracking);
-  line-height: 1.5;
 }
 
 .landing-theme-toggle {
@@ -870,12 +857,6 @@
 .landing-command-icon {
   flex-shrink: 0;
   color: var(--color-text-secondary);
-}
-
-.landing-status {
-  font-size: var(--landing-index-link-size);
-  color: var(--color-text-secondary);
-  min-height: var(--spacing-6);
 }
 
 /* ── Footer ─────────────────────────────────────────────────────────────── */

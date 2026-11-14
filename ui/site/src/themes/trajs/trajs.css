@@ -140,16 +140,8 @@
     --_button-radius: var(--radius-element);
   }
 
-  .astryx-popover {
-    background-color: var(--color-background-body);
-    background-image: linear-gradient(var(--color-background-surface), var(--color-background-surface));
-    border-radius: var(--radius-element);
-    box-shadow: none;
-    --_popover-radius: var(--radius-element);
-  }
-
-  .astryx-bottom-sheet {
-    background-color: var(--color-background-card);
+  .astryx-mobile-nav {
+    --color-background-surface: var(--color-background-body);
   }
 }
 }
