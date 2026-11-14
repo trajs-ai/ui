@@ -21,6 +21,7 @@ import { BrandMark } from "./internal/brand-mark";
 import { brandShaders, stillBrandShaders } from "./internal/brand-shader";
 import { landingAssets } from "./internal/landing-assets";
 import { LandingGuides, LandingMarks } from "./internal/landing-guides";
+import { LandingPitch } from "./internal/landing-pitch";
 import { palette, type ColorMode } from "./themes/trajs/palette";
 
 const repository = "https://github.com/trajs-ai/trajs";
@@ -157,12 +158,76 @@ export function App() {
       <VStack id="top" className="landing-page">
         <VStack as="main" className="landing-sheet">
           <LandingGuides />
-          <Link href={notice.href} color="inherit" type="inherit" className="landing-notice">
-            <HStack gap={1.5} vAlign="center">
-              <Text type="inherit">{notice.label}</Text>
-              <img src={assets.arrowUpRight} alt="" className="landing-ink-asset" />
-            </HStack>
-          </Link>
+          {/* The sheet runs one composition per window. The masthead opens the
+              first of them, so that screen takes the plate's own height and the
+              hero centers in the band the masthead leaves. */}
+          <VStack className="landing-screen landing-screen--opening">
+            <Link href={notice.href} color="inherit" type="inherit" className="landing-notice">
+              <HStack gap={1.5} vAlign="center">
+                <Text type="inherit">{notice.label}</Text>
+                <img src={assets.arrowUpRight} alt="" className="landing-ink-asset" />
+              </HStack>
+            </Link>
+            <Grid className="landing-hero">
+              <VStack className="landing-headline">
+                <Heading level={1} className="landing-heading">
+                  <Text as="span" display="block" type="inherit" className="landing-headline-line">
+                    Record.
+                  </Text>
+                  <Text as="span" display="block" type="inherit" className="landing-analysis-line">
+                    Analysis.
+                  </Text>
+                  <Text as="span" display="block" type="inherit" className="landing-headline-line">
+                    Exchange.
+                  </Text>
+                </Heading>
+              </VStack>
+              <VStack className="landing-art">
+                <VStack role="img" aria-label="TRAJS" className="landing-lockup">
+                  <VStack className="landing-symbol" aria-hidden="true">
+                    <BrandMark
+                      mask={assets.symbolFill}
+                      shader={shader}
+                      reducesMotion={reducesMotion}
+                    />
+                  </VStack>
+                  <img src={assets.wordmark} alt="" className="landing-wordmark" />
+                </VStack>
+              </VStack>
+              <HStack vAlign="center" className="landing-ctas">
+                <Button
+                  label="Get started"
+                  href={navigation[0].href}
+                  variant="primary"
+                  size="lg"
+                  className="landing-action"
+                  endContent={
+                    <img src={assets.arrowRight} alt="" className="landing-action-icon" />
+                  }
+                />
+                <ClickableCard
+                  label={`Copy install command: ${installCommand}`}
+                  onClick={copyInstallCommand}
+                  variant="transparent"
+                  padding={0}
+                  className="landing-command"
+                >
+                  <Text type="code" className="landing-prompt" aria-hidden="true">
+                    $
+                  </Text>
+                  <Text as="p" type="code" className="landing-command-text">
+                    {installCommand}
+                  </Text>
+                  {installCopied ? (
+                    <Icon icon="check" className="landing-command-icon" />
+                  ) : (
+                    <Icon icon="copy" className="landing-command-icon" />
+                  )}
+                </ClickableCard>
+              </HStack>
+            </Grid>
+          </VStack>
+          <LandingPitch reducesMotion={reducesMotion} />
           <LandingMarks />
           {/* The frame is the page's and the navigation is TopNav's, so the links
               and the drawer keep the system's semantics and keyboard behavior. */}
@@ -254,62 +319,6 @@ export function App() {
               />
             ))}
           </MobileNav>
-          <Grid className="landing-hero">
-            <VStack className="landing-headline">
-              <Heading level={1} className="landing-heading">
-                <Text as="span" display="block" type="inherit" className="landing-headline-line">
-                  Record.
-                </Text>
-                <Text as="span" display="block" type="inherit" className="landing-analysis-line">
-                  Analysis.
-                </Text>
-                <Text as="span" display="block" type="inherit" className="landing-headline-line">
-                  Exchange.
-                </Text>
-              </Heading>
-            </VStack>
-            <VStack className="landing-art">
-              <VStack role="img" aria-label="TRAJS" className="landing-lockup">
-                <VStack className="landing-symbol" aria-hidden="true">
-                  <BrandMark
-                    mask={assets.symbolFill}
-                    shader={shader}
-                    reducesMotion={reducesMotion}
-                  />
-                </VStack>
-                <img src={assets.wordmark} alt="" className="landing-wordmark" />
-              </VStack>
-            </VStack>
-            <HStack vAlign="center" className="landing-ctas">
-              <Button
-                label="Get started"
-                href={navigation[0].href}
-                variant="primary"
-                size="lg"
-                className="landing-action"
-                endContent={<img src={assets.arrowRight} alt="" className="landing-action-icon" />}
-              />
-              <ClickableCard
-                label={`Copy install command: ${installCommand}`}
-                onClick={copyInstallCommand}
-                variant="transparent"
-                padding={0}
-                className="landing-command"
-              >
-                <Text type="code" className="landing-prompt" aria-hidden="true">
-                  $
-                </Text>
-                <Text as="p" type="code" className="landing-command-text">
-                  {installCommand}
-                </Text>
-                {installCopied ? (
-                  <Icon icon="check" className="landing-command-icon" />
-                ) : (
-                  <Icon icon="copy" className="landing-command-icon" />
-                )}
-              </ClickableCard>
-            </HStack>
-          </Grid>
         </VStack>
         <VStack as="footer" className="landing-footer">
           <Grid className="landing-footer-index">

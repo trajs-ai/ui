@@ -49,11 +49,34 @@ marks and the bar's accent arrows are the board's original Figma exports per
 mode, and the shader pigments come from the same palette.
 
 The page's composition is `src/internal/landing.css`: the sheet's frame, the
-hero, the masthead and the footer, with the values that are this page's own
+screens, the masthead and the footer, with the values that are this page's own
 geometry held as `--landing-*` properties on `.landing-page`. It carries one
 responsive contract, one band per width — tablet from 720, the position-
 sensitive desktop board from 1440, one column below 720 — and every token in the
 bands was drawn on one of the three Figma boards.
+
+The sheet below the masthead is a run of screens, each one window tall. The
+first is the hero; the second states the claim the hero's three words sum up,
+"TRAJS is <the answer> for Agent Trajectory", with its object rolling through
+Open Format, Extension Ecosystem and Standard Library on a 2.6-second beat
+(`src/internal/landing-pitch.tsx`). It keeps the hero's measure, so both screens
+start on one column; it hangs on the plate's left edge on the board and centers
+wherever the page's own type centers, and on the phone it is the largest size
+whose whole sentence the column holds. The sentence keeps one size in every band,
+so the answer is never louder than the words around it, and it is one line per
+part at every width, so the stage under it keeps the rest of the screen. The
+window it rolls in is one line box tall and the three answers travel in whole
+line boxes, one per beat, which is what makes a beat read as one line of a roll;
+the answer in the middle takes the primary ink and the sentence around it the
+secondary. The heading's name is the whole sentence, so a reader without the
+motion reads all three, and reduced motion stops the beat. The stage under the
+sentence is empty until the panel that follows the answer in the middle lands
+there; it already holds the rest of the screen, so that content arrives without
+moving the sentence above it. The document snaps to that screen, so a scroll that
+ends near it settles with the composition at the top of the window. It is the
+page's only stop so far, which is why the snap is proximity rather than
+mandatory: a mandatory container snaps every scroll offset to its one stop, and
+the screens after this one add their own.
 
 The header is fixed and initially hidden. Scrolling past 64 CSS pixels reveals
 it through blur, opacity and translation; returning to the top hides it again.

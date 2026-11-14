@@ -112,6 +112,23 @@
   --landing-command-padding: clamp(0.875rem, 1.0417vw, 1.25rem);
   --landing-prompt-size: clamp(0.8125rem, 0.9896vw, 1.1875rem);
 
+  /* The second screen states the claim the hero's three words sum up: one
+     sentence whose object turns through the three answers, over the stage that
+     the answer's content fills. It keeps the hero's measure, so both screens
+     start on one column. The claim's window is one line box tall and the rows
+     under it travel in whole line boxes, so one step reads as one line of a
+     roll. The screen's first line clears the floating header. */
+  --landing-pitch-top: calc(var(--landing-nav-top) + var(--landing-nav-height) + var(--spacing-12));
+  --landing-pitch-bottom: var(--landing-stage-bottom);
+  --landing-pitch-gap: clamp(3rem, 2rem + 2.5vw, 6rem);
+  --landing-claim-size: clamp(2.5rem, 1.75rem + 3vw, 6rem);
+  --landing-claim-leading: 1.16;
+  --landing-claim-line-box: calc(var(--landing-claim-size) * var(--landing-claim-leading));
+  --landing-claim-step: var(--duration-medium);
+  /* The claim hangs on the plate's left edge on the board, where the hero's
+     composition starts, and centers where the page's own type centers. */
+  --landing-claim-align: start;
+
   /* Labels and body copy shared by the footer and the status line. */
   --landing-index-body-size: clamp(1rem, 0.75rem + 0.4167vw, 1.25rem);
   --landing-index-body-leading: clamp(1.5rem, 1.25rem + 0.625vw, 2rem);
@@ -227,6 +244,13 @@
     --landing-cta-gap: calc(var(--landing-tablet-block) * 16 / 640);
     --landing-command-gap: calc(var(--landing-tablet-block) * 12 / 640);
     --landing-action-icon-size: calc(var(--landing-tablet-block) * 20 / 640);
+    /* The claim is the tablet block's own type size, one step down from the
+       headline's, and its bands take the block's air instead of the viewport's. */
+    --landing-pitch-gap: calc(var(--landing-tablet-block) * 56 / 640);
+    --landing-claim-size: calc(var(--landing-tablet-block) * 56 / 640);
+    /* The tablet composition is centered on the sheet, so its one-sentence
+       screen centers with it. */
+    --landing-claim-align: center;
     --landing-index-body-size: 1rem;
     --landing-index-body-leading: 1.5625rem;
     --landing-index-label-size: 0.9375rem;
@@ -278,6 +302,11 @@
     --landing-cta-gap: min(1rem, 0.8333333vw, 1.4814815svh);
     --landing-command-gap: min(0.75rem, 0.625vw, 1.1111111svh);
     --landing-action-icon-size: min(1.25rem, 1.0416667vw, 1.8518519svh);
+    /* The claim keeps the board's 96px type and its bands, so the second screen
+       is drawn on the same 1920 board as the hero and breathes in with it when
+       the window is short. */
+    --landing-pitch-gap: min(5rem, 4.1666667vw, 7.4074074svh);
+    --landing-claim-size: min(6rem, 5vw, 8.8888889svh);
     --landing-index-body-size: min(1.25rem, 1.0416667vw, 1.8518519svh);
     --landing-index-body-leading: min(2rem, 1.6666667vw, 2.962963svh);
     --landing-index-label-size: min(1.125rem, 0.9375vw, 1.6666667svh);
@@ -333,6 +362,19 @@
     --landing-symbol-width: 100%;
     --landing-wordmark-display: none;
     --landing-cta-display: none;
+    /* The phone has one column, so the claim is the largest size the column holds
+       the whole sentence in, with a margin either side, and never more than the
+       band's own display size. The sentence stays one line per part at every
+       width, which is what keeps the stage under it the rest of the screen. */
+    --landing-pitch-top: calc(
+      var(--landing-nav-top) + var(--landing-nav-height) + var(--spacing-6)
+    );
+    --landing-pitch-gap: var(--spacing-8);
+    --landing-claim-size: min(
+      var(--landing-display-size),
+      calc((100vw - 2 * var(--landing-page-inline)) * 0.1)
+    );
+    --landing-claim-align: center;
     --landing-index-body-size: 0.9375rem;
     --landing-index-body-leading: 1.4375rem;
     --landing-index-label-size: 0.9375rem;
@@ -362,7 +404,9 @@
 .landing-page {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
+  /* Clipped, not hidden: the page must not become a scroll container of its own,
+     or the document above it would have no screen to snap to. */
+  overflow-x: clip;
   /* Revealing the header needs scroll travel. Short pages reserve enough travel
      even when their content fits in the window. */
   min-height: calc(100svh + max(var(--landing-nav-height), 5rem));
@@ -380,6 +424,28 @@
 .landing-sheet {
   position: relative;
   isolation: isolate;
+}
+
+/* ── Screens ────────────────────────────────────────────────────────────── */
+
+/* The document is the scroll container, and the page does not own it, so the rule
+   reaches it through the page's own presence. The claim screen is the only stop so
+   far, and one stop cannot be mandatory, since that snaps every offset to it;
+   proximity settles a scroll that ends near the stop and leaves the rest of the
+   page free until later screens add their own. */
+html:has(.landing-page) {
+  scroll-snap-type: y proximity;
+}
+
+/* The sheet runs one composition per window, so a reader who scrolls meets one
+   screen at a time. */
+.landing-screen {
+  min-height: 100svh;
+}
+
+/* The opening screen is the plate's own height, because the masthead opens it
+   inside those margins; every screen after it is a whole window. */
+.landing-screen--opening {
   min-height: calc(100svh - var(--landing-page-top) - var(--landing-page-bottom));
 }
 
@@ -659,15 +725,21 @@
   min-width: 0;
 }
 
-.landing-heading {
-  white-space: nowrap;
-  font-size: var(--landing-display-size);
-  line-height: var(--landing-display-leading);
+/* The page's display cut: the board's width, round and weight, shared by the
+   hero's headline and the claim. */
+.landing-heading,
+.landing-claim {
   font-weight: var(--landing-display-weight);
   letter-spacing: -0.01em;
   font-variation-settings:
     "wdth" 100,
     "ROND" 0;
+}
+
+.landing-heading {
+  white-space: nowrap;
+  font-size: var(--landing-display-size);
+  line-height: var(--landing-display-leading);
   text-align: var(--landing-heading-align);
 }
 
@@ -960,13 +1032,99 @@
   white-space: nowrap;
 }
 
+/* ── Claim ──────────────────────────────────────────────────────────────── */
+
+/* The second screen: the sentence naming what TRAJS is for agent trajectory,
+   whose object turns through the three answers, over the stage their content
+   fills. It keeps the hero's measure and margins, so both screens start on one
+   column. */
+.landing-pitch {
+  width: var(--landing-hero-width);
+  margin-inline: var(--landing-hero-margin);
+  padding-block: var(--landing-pitch-top) var(--landing-pitch-bottom);
+  row-gap: var(--landing-pitch-gap);
+  /* The screen's stop: a scroll that ends near this composition settles with it
+     at the top of the window instead of between it and the one above. */
+  scroll-snap-align: start;
+}
+
+/* The sentence around the answer takes the quieter ink, so the answer in the
+   middle is the part the page highlights. */
+.landing-claim {
+  font-size: var(--landing-claim-size);
+  line-height: var(--landing-claim-leading);
+  color: var(--color-text-secondary);
+  text-align: var(--landing-claim-align);
+  white-space: nowrap;
+}
+
+.landing-claim-line {
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  white-space: nowrap;
+}
+
+/* The window is the line the answer takes: one line box tall and clipped, so
+   the answers above and below it are out of sight until they travel in. */
+.landing-claim-window {
+  position: relative;
+  height: var(--landing-claim-line-box);
+  overflow: hidden;
+}
+
+/* The three answers are placed by their place in the list, so an answer keeps its
+   element as it travels and the one arriving from below is the one that just left
+   the top. The answer crossing from one end of the list to the other is the one
+   exception, and it is transparent at both ends, so the crossing is never seen. */
+.landing-claim-row {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  font: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  white-space: nowrap;
+  transition:
+    transform var(--landing-claim-step) var(--ease-move),
+    opacity var(--landing-claim-step) var(--ease-move),
+    color var(--landing-claim-step) var(--ease-move);
+}
+
+.landing-claim-row--middle {
+  transform: translateY(0);
+  opacity: 1;
+  color: var(--color-text-primary);
+}
+
+.landing-claim-row--above {
+  transform: translateY(-100%);
+  opacity: 0;
+  color: var(--color-text-secondary);
+}
+
+.landing-claim-row--below {
+  transform: translateY(100%);
+  opacity: 0;
+  color: var(--color-text-secondary);
+}
+
+/* The claim's other half: empty until the content answering the answer in the
+   middle lands here. It holds the rest of the screen, so the sentence and its
+   content are read together instead of the screen holding a title over a gap. */
+.landing-pitch-stage {
+  flex: 1;
+}
+
 /* Reduced motion keeps the two beats and drops the travel between them. Every
    layer lands on its finished state instead of transitioning into it. */
 @media (prefers-reduced-motion: reduce) {
   .landing-header,
   .landing-symbol-plate,
   .landing-outline-path,
-  .landing-shader {
+  .landing-shader,
+  .landing-claim-row {
     transition: none;
   }
 }
