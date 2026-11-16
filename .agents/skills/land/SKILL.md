@@ -107,31 +107,6 @@ success.
 - Note the target branch and commit; state plainly if the change did not reach
   the remote.
 
-## 7. Stop the dev servers
-
-The merge is not done until no dev server of this thread is left. They outlive
-the thread, so once the change is merged nothing owns them. The same holds for
-the servers of the threads this one forked from or into, once their work is
-merged: `stop` ends this checkout alone, so sweep the rest by pidfile.
-
-```sh
-ui/scripts/dev-server.sh stop ui/<project>
-ui/scripts/dev-server.sh status ui/<project>   # exits 1 now
-pgrep -af 'portless run --name'                # each server leaves /tmp/<name>.pid
-lsof -a -p <pid> -d cwd -Fn                    # the checkout it serves
-```
-
-`/tmp/<name>.pid` is the group leader of `https://<name>.localhost`. The
-portless command line names no checkout, so read the server's worktree from the
-cwd of its process group. Stop every server whose checkout belongs to this
-thread or to a thread it forked from or into, once that thread's work is
-merged: `kill -TERM -<pgid>`, delete the pidfile, and confirm `curl -skI` fails
-for its URL. Leave the servers of unrelated threads alone. The shared proxy
-exits with the last server; a later `start` recreates both.
-
-A merge that stopped at Gates is not finished, so this step waits: keep the
-servers while you keep working, and stop them when you stop.
-
 Coming from a subthread, the parent's checkout stays on the pre-merge commit and
 still holds the diff this merge pushed. Name the reset in the report, so the
 parent does not commit that diff twice: `git fetch && git reset --hard
@@ -167,8 +142,7 @@ nothing after it.
 A remote that has advanced is not a conflict: merge it in (`git merge
 origin/main`), re-run Verify on the packages that differ from `origin/main`,
 and push. Stop only when git reports a conflict it cannot merge, or when those
-checks fail. Never force-push. Confirm and Stop the dev servers still apply
-after the retried push.
+checks fail. Never force-push. Confirm still applies after the retried push.
 
 ## Gates
 

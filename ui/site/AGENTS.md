@@ -5,11 +5,10 @@ Project-specific guidance for AI coding agents.
 ## Dev server
 
 Every task that touches this site runs a dev server and hands the user its URL.
-It is served through the shared launcher; [../AGENTS.md](../AGENTS.md) has the
-contract, the TLD rule and the restart rule.
+[../AGENTS.md](../AGENTS.md) has the contract and the restart rule.
 
 ```sh
-../scripts/dev-server.sh start .
+vp dev    # in ui/site; background process, URL printed on start
 ```
 
 <!-- ASTRYX:START -->
