@@ -20,8 +20,8 @@ import { defaultThemeSlug, themes } from "./astryx-themes";
 import { BrandMark } from "./internal/brand-mark";
 import { brandShaders, stillBrandShaders } from "./internal/brand-shader";
 import { landingAssets } from "./internal/landing-assets";
-import { LandingGuides, LandingMarks } from "./internal/landing-guides";
 import { LandingPitch } from "./internal/landing-pitch";
+import { LandingPlate } from "./internal/landing-plate";
 import { palette, type ColorMode } from "./themes/trajs/palette";
 
 const repository = "https://github.com/trajs-ai/trajs";
@@ -157,11 +157,11 @@ export function App() {
     <Theme theme={themes[defaultThemeSlug]} mode={mode}>
       <VStack id="top" className="landing-page">
         <VStack as="main" className="landing-sheet">
-          <LandingGuides />
-          {/* The sheet runs one composition per window. The masthead opens the
-              first of them, so that screen takes the plate's own height and the
-              hero centers in the band the masthead leaves. */}
-          <VStack className="landing-screen landing-screen--opening">
+          {/* The sheet runs one composition per window, and each screen is a
+              plate, so a reader scrolls from one sheet of paper to the next. The
+              masthead opens the first screen inside that plate's own height, so
+              the hero centers in the band the masthead leaves. */}
+          <LandingPlate className="landing-screen">
             <Link href={notice.href} color="inherit" type="inherit" className="landing-notice">
               <HStack gap={1.5} vAlign="center">
                 <Text type="inherit">{notice.label}</Text>
@@ -226,9 +226,10 @@ export function App() {
                 </ClickableCard>
               </HStack>
             </Grid>
-          </VStack>
-          <LandingPitch reducesMotion={reducesMotion} />
-          <LandingMarks />
+          </LandingPlate>
+          <LandingPlate as="section" className="landing-screen landing-screen--snap">
+            <LandingPitch reducesMotion={reducesMotion} />
+          </LandingPlate>
           {/* The frame is the page's and the navigation is TopNav's, so the links
               and the drawer keep the system's semantics and keyboard behavior. */}
           <HStack

@@ -33,9 +33,10 @@ function placeOf(answer: number, active: number) {
 }
 
 /**
- * The second screen: the sentence naming what TRAJS is for agent trajectory,
- * whose object turns through the three answers, over the stage the answer's
- * content will fill.
+ * The second screen's composition: the sentence naming what TRAJS is for agent
+ * trajectory, whose object turns through the three answers, over the stage the
+ * answer's content will fill. The screen and its plate are the page's, so this
+ * fills the one it is given.
  */
 export function LandingPitch({ reducesMotion }: { reducesMotion: boolean }) {
   // The stage reads this same index, so the sentence and the content answering it
@@ -53,7 +54,7 @@ export function LandingPitch({ reducesMotion }: { reducesMotion: boolean }) {
   }, [reducesMotion]);
 
   return (
-    <VStack as="section" className="landing-screen landing-pitch">
+    <VStack className="landing-pitch">
       {/* The name carries the whole sentence: the window is a moving picture of
           its object, so a reader without the motion still reads all three. */}
       <Heading level={2} className="landing-claim" aria-label={claim}>

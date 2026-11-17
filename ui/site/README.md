@@ -48,15 +48,28 @@ page's composition is never part of it. Both modes share `palette.ts`; the brand
 marks and the bar's accent arrows are the board's original Figma exports per
 mode, and the shader pigments come from the same palette.
 
-The page's composition is `src/internal/landing.css`: the sheet's frame, the
-screens, the masthead and the footer, with the values that are this page's own
-geometry held as `--landing-*` properties on `.landing-page`. It carries one
-responsive contract, one band per width — tablet from 720, the position-
-sensitive desktop board from 1440, one column below 720 — and every token in the
-bands was drawn on one of the three Figma boards.
+The page's composition is `src/internal/landing.css`: the plate, the screens, the
+masthead and the footer, with the values that are this page's own geometry held
+as `--landing-*` properties on `.landing-page`. It carries one responsive
+contract, one band per width — tablet from 720, the position-sensitive desktop
+board from 1440, one column below 720 — and every token in the bands was drawn on
+one of the three Figma boards.
 
-The sheet below the masthead is a run of screens, each one window tall. The
-first is the hero; the second states the claim the hero's three words sum up,
+The page is drawn on plates, and a plate is one block of it as a sheet of paper of
+its own. `LandingPlate` (`src/internal/landing-plate.tsx`) is the whole unit: it
+wraps the block in `landing-plate`, puts the construction sheet — the frame, the
+graph paper, the margin ruler, the grain — behind the block's content, and the
+four register marks above it. Nothing is shared between plates, down to the SVG
+ids each one names its defs with, so two plates read as two sheets rather than as
+one sheet with a rule across it, and adding a block is one component with the
+block's own class. `.landing-screen` is the class that makes a plate take the
+window less the page's margins, and `.landing-screen--snap` makes it a scroll
+stop; a plate without either is a block of whatever height its content gives it.
+
+The sheet below the masthead is a run of screens, each one window tall and each
+on a plate of its own, so the plates float on the pasteboard with one band of it
+between them, the lower plate's ruler in that band. The first screen is the hero;
+the second states the claim the hero's three words sum up,
 "TRAJS is <the answer> for Agent Trajectory", with its object rolling through
 Open Format, Extension Ecosystem and Standard Library on a 2.6-second beat
 (`src/internal/landing-pitch.tsx`). It keeps the hero's measure, so both screens
@@ -73,10 +86,11 @@ motion reads all three, and reduced motion stops the beat. The stage under the
 sentence is empty until the panel that follows the answer in the middle lands
 there; it already holds the rest of the screen, so that content arrives without
 moving the sentence above it. The document snaps to that screen, so a scroll that
-ends near it settles with the composition at the top of the window. It is the
-page's only stop so far, which is why the snap is proximity rather than
-mandatory: a mandatory container snaps every scroll offset to its one stop, and
-the screens after this one add their own.
+ends near it settles with the composition at the top of the window, framed the
+way the first screen is at the top of the page. It is the page's only stop so
+far, which is why the snap is proximity rather than mandatory: a mandatory
+container snaps every offset to its one stop, and the screens after this one add
+their own.
 
 The header is fixed and initially hidden. Scrolling past 64 CSS pixels reveals
 it through blur, opacity and translation; returning to the top hides it again.
@@ -88,7 +102,7 @@ button opens. The install command's copy confirmation is `useClipboard`'s, not
 the page's own timer.
 
 The footer is not drawn on the board, and it is detached from the sheet: the
-frame's border closes after the index, and the footer stands below it on the
+last plate's frame closes after the claim, and the footer stands below it on the
 darker pasteboard, separated by the same gap the rest of the page uses. It
 extends the sheet's own index anatomy: a section rule opens the same
 three-column grid as the index, where the brand block carries the page's

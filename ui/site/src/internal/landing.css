@@ -20,6 +20,10 @@
   --landing-page-top: var(--landing-page-inline);
   --landing-page-bottom: var(--landing-page-inline);
   --landing-frame-outset: var(--spacing-6);
+  /* Each screen is its own plate, so the sheet keeps one band of pasteboard
+     between two of them. The band also carries the lower plate's top ruler, so
+     it is wider than the air the page leaves around a single plate. */
+  --landing-screen-gap: var(--spacing-10);
   --landing-ruler-display: flex;
   --landing-grid-display: block;
 
@@ -417,16 +421,19 @@
   padding: var(--landing-page-top) var(--landing-page-inline) var(--landing-page-bottom);
 }
 
-/* The sheet is the main content only: the frame draws its plate and closes the
-   border above the footer, which stands on the pasteboard outside it. The plate
-   fills the window less the page's own margins, so the first screen is all sheet
+/* The sheet is the main content only: a run of screens, each of them a plate of
+   its own, over the pasteboard that the footer stands on outside it. A screen
+   fills the window less the page's own margins, so a reader meets one at a time
    and the footer waits below the fold. */
 .landing-sheet {
   position: relative;
   isolation: isolate;
+  /* Both plates around the band stand one frame outset outside their screens, so
+     the stack keeps that much room either side of the pasteboard between them. */
+  row-gap: calc(2 * var(--landing-frame-outset) + var(--landing-screen-gap));
 }
 
-/* ── Screens ────────────────────────────────────────────────────────────── */
+/* ── Plates and screens ─────────────────────────────────────────────────── */
 
 /* The document is the scroll container, and the page does not own it, so the rule
    reaches it through the page's own presence. The claim screen is the only stop so
@@ -437,50 +444,67 @@ html:has(.landing-page) {
   scroll-snap-type: y proximity;
 }
 
-/* The sheet runs one composition per window, so a reader who scrolls meets one
-   screen at a time. */
-.landing-screen {
-  min-height: 100svh;
+/* A plate is one block of the page drawn on a sheet of paper of its own: the
+   block's own element, with the construction sheet behind its content and the
+   register marks above it. It isolates that negative layer, and it is the box the
+   frame, the rulers and the grain measure themselves against, so a block of any
+   height gets paper of that height. `LandingPlate` puts the three together; a
+   block that is not a screen, such as a band or a panel, is a plate with no
+   further class. */
+.landing-plate {
+  position: relative;
+  isolation: isolate;
 }
 
-/* The opening screen is the plate's own height, because the masthead opens it
-   inside those margins; every screen after it is a whole window. */
-.landing-screen--opening {
+/* A screen is a plate that takes the window less the page's margins, so a reader
+   meets one composition at a time. The plate stands one frame outset outside the
+   screen, so a screen's paper floats on the pasteboard. */
+.landing-screen {
   min-height: calc(100svh - var(--landing-page-top) - var(--landing-page-bottom));
 }
 
-/* The page isolates its own stacking context, so this negative layer stays above
-   the page fill and behind the content. */
-.landing-guides {
+/* A screen the document snaps to: a scroll that ends near it settles on it
+   instead of between it and the one above, and it keeps the page's own top
+   margin above the plate, so the screen the reader settles on is framed the way
+   the first one is at the top of the page. */
+.landing-screen--snap {
+  scroll-snap-align: start;
+  scroll-margin-block-start: var(--landing-page-top);
+}
+
+/* The plate isolates its own stacking context, so this negative layer stays
+   above the page fill and behind the content. */
+.landing-plate-backdrop {
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
 }
 
-/* The sheet's graph paper: one 24px module with a stronger line every fourth,
+/* The plate's graph paper: one 24px module with a stronger line every fourth,
    drawn behind the grain so the plate reads as drafted stock. It takes no input
    and never repaints. */
-.landing-guide-grid {
+.landing-plate-grid {
   position: absolute;
   inset: 0;
   display: var(--landing-grid-display);
   pointer-events: none;
 }
 
-/* Both tiers of the sheet's graph paper are 1px and one step below the guides. */
-.landing-grid-minor {
+/* Both tiers of the plate's graph paper are 1px and one step below the guides. */
+.landing-plate-grid-minor {
   stroke: var(--color-grid);
 }
 
-.landing-grid-major {
+.landing-plate-grid-major {
   stroke: var(--color-grid-strong);
 }
 
-/* The grain belongs to the frame's plate, not the pasteboard around it, so the
-   margins stay clean and only the live area reads as printed stock. It never
-   takes input, and the tile is static: no repaint per frame, no motion to
-   reduce. */
+/* The paper's grain, shared by the plate and by the mark's own paper island,
+   which is why it keeps its own name instead of the plate's prefix. It belongs to
+   the frame's plate, not the pasteboard around it, so the margins stay clean and
+   only the live area reads as printed stock. It never takes input, and the tile
+   is static: no repaint per frame, no motion to reduce. */
 .landing-grain {
   position: absolute;
   inset: 0;
@@ -492,12 +516,12 @@ html:has(.landing-page) {
 }
 
 /* The frame stands off the live area, so no line of copy or control ever touches
-   the trim. It wraps the sheet only and stops above the footer, so the footer
-   reads as a separate block instead of the sheet's last row. The edge is an
+   the trim. It is the plate's own paper, so a block ends where its paper ends and
+   the pasteboard around it separates it from the block beside it. The edge is an
    inset shadow rather than a border: a border would push the grid and both
    rulers a pixel off its own edge, so the scale would start a pixel away from
    the corner marks that pin it. */
-.landing-guide-frame {
+.landing-plate-frame {
   position: absolute;
   inset: calc(-1 * var(--landing-frame-outset));
   background: var(--color-background-body);
@@ -505,34 +529,34 @@ html:has(.landing-page) {
 }
 
 /* The ruler turns the corner: the same module continues along the frame's top
-   edge, so the sheet is calibrated on two sides while the live area stays
+   edge, so the plate is calibrated on two sides while the live area stays
    completely clear of lines. It is drawn as SVG rather than a repeating
    gradient so each graduation is a crisp 1px stroke that meets the border
    without a half-pixel blur. */
-.landing-ruler-top {
+.landing-plate-ruler {
   position: absolute;
   display: var(--landing-ruler-display);
+  overflow: visible;
+}
+
+.landing-plate-ruler--top {
   bottom: 100%;
   left: 0;
   width: 100%;
   height: 1.25rem;
-  overflow: visible;
 }
 
-.landing-ruler-left {
-  position: absolute;
-  display: var(--landing-ruler-display);
+.landing-plate-ruler--left {
   right: 100%;
   top: 0;
   height: 100%;
   width: 1.25rem;
-  overflow: visible;
 }
 
 /* Every mark shares the frame's 1px weight and one color, so rank is carried by
    length alone and the scale stays a quiet margin note rather than a second
    border. */
-.landing-ruler-ticks {
+.landing-plate-ruler-ticks {
   stroke: var(--color-guide);
 }
 
@@ -541,7 +565,7 @@ html:has(.landing-page) {
    interrupts both rules it joins instead of stopping short of them. Half a pixel
    puts that center on the middle of the frame's 1px edge rather than on the box's
    outer coordinate, which would sit the mark half a pixel off both rules. */
-.landing-guide-node {
+.landing-plate-node {
   position: absolute;
   width: 0.4375rem;
   height: 0.4375rem;
@@ -549,25 +573,25 @@ html:has(.landing-page) {
   background: var(--color-background-body);
 }
 
-.landing-guide-node--top-left {
+.landing-plate-node--top-left {
   top: 0.5px;
   left: 0.5px;
   transform: translate(-50%, -50%) rotate(45deg);
 }
 
-.landing-guide-node--top-right {
+.landing-plate-node--top-right {
   top: 0.5px;
   right: 0.5px;
   transform: translate(50%, -50%) rotate(45deg);
 }
 
-.landing-guide-node--bottom-left {
+.landing-plate-node--bottom-left {
   bottom: 0.5px;
   left: 0.5px;
   transform: translate(-50%, 50%) rotate(45deg);
 }
 
-.landing-guide-node--bottom-right {
+.landing-plate-node--bottom-right {
   bottom: 0.5px;
   right: 0.5px;
   transform: translate(50%, 50%) rotate(45deg);
@@ -575,7 +599,7 @@ html:has(.landing-page) {
 
 /* The corner marks paint above the masthead, so the band can close the frame's
    top edge without clipping them. */
-.landing-guide-marks {
+.landing-plate-marks {
   position: absolute;
   inset: calc(-1 * var(--landing-frame-outset));
   z-index: 1;
@@ -1039,13 +1063,13 @@ html:has(.landing-page) {
    fills. It keeps the hero's measure and margins, so both screens start on one
    column. */
 .landing-pitch {
+  /* The composition fills its screen, so the stage under the sentence takes what
+     the copy leaves of the plate. */
+  flex: 1;
   width: var(--landing-hero-width);
   margin-inline: var(--landing-hero-margin);
   padding-block: var(--landing-pitch-top) var(--landing-pitch-bottom);
   row-gap: var(--landing-pitch-gap);
-  /* The screen's stop: a scroll that ends near this composition settles with it
-     at the top of the window instead of between it and the one above. */
-  scroll-snap-align: start;
 }
 
 /* The sentence around the answer takes the quieter ink, so the answer in the
